@@ -1,0 +1,3 @@
+[submodule "maestrohub"]
+	path = maestrohub
+	url = https://github.com/theaarjav/maestrohub

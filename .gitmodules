@@ -1,0 +1,3 @@
+[submodule "fithub"]
+	path = fithub
+	url = https://github.com/theaarjav/fithub
