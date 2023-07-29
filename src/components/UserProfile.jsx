@@ -150,7 +150,14 @@ export const UserProfile = () => {
 
             <Spinner />
 
-        </div> :
+        </div> :!Profile?<div className='container' style={{
+            display: "flex",
+            padding: "5vh",
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center"
+        }}>User has no Profile</div>:
            Profile && Profile.user && <>
                 <h1>
                     {<div style={{

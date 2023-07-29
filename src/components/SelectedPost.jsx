@@ -10,6 +10,8 @@ import Swal from 'sweetalert2';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { useParams } from 'react-router-dom';
 import Badge from 'react-bootstrap/esm/Badge';
+import { Comment } from './Comment';
+import './SelectedPost.css'
 // import { useNavigate } from 'react-router-dom';
 export const SelectedPost = () => {
     const navigate = useNavigate();
@@ -17,6 +19,7 @@ export const SelectedPost = () => {
     const [user, setuser] = useState([])
     const [profile, setprofile] = useState([])
     const [Loading, setLoading] = useState(true)
+    const [newComment, setnewComment] = useState(false)
     const post_id = useParams().postID
     const getPost = async () => {
         let { data, status } = await axios.get(`https://maestrohub-backend.onrender.com/api/post/${post_id}`, {
@@ -108,16 +111,23 @@ export const SelectedPost = () => {
 
     }
     const handleViewProfile = async (id) => {
-        let { data, status } = await axios.get(`https://maestrohub-backend.onrender.com/api/profile/users/${id}`, {
-            headers: {
-                "Content-Type": "application/json",
+        console.log("clicked",id)
+        // return Swal.fire("get","","info")
+        let { data, status } = await axios.get(`https://maestrohub-backend.onrender.com/api/profile/users/${id}`)
+        console.log(data, status)
+        if (status === 200)
+        {
+            let profile;
+            if (data.profile) {
+                profile = data.profile._id;
+                navigate(`/users/${profile}`)
+            }else{
+                return Swal.fire(data.msg,"","info")
             }
-        })
-        let profile;
-        if (status === 200) profile = data.profile._id;
-        if (profile) {
-            navigate(`/users/${profile}`)
-        }
+        } 
+            
+        
+        
     }
     const handleDelete = async (postID) => {
         // e.preventDefault();
@@ -145,7 +155,7 @@ export const SelectedPost = () => {
         if (newcomment === "" || newcomment === null || newcomment === undefined) {
             return Swal.fire("Comment can't be empty", "", "warning")
         }
-        let { data, status } = await axios.put(`https://maestrohub-backend.onrender.com/api/post/comments/${post_id}`, {
+        let { data, status } = await axios.put(`https://maestrohub-backend.onrender.com/api/post/comments/${post_id}/none`, {
             text: newcomment
         }, {
             headers: {
@@ -159,9 +169,13 @@ export const SelectedPost = () => {
             // getuser();
             setComment("");
         }
+        setnewComment(false)
     }
 
     const handleCommentDelete = async (id) => {
+        {post.comments.map((childcomment) => {
+            if(childcomment.parent === id) handleCommentDelete(this, childcomment._id)
+        })}
         let { data, status } = await axios.delete(`https://maestrohub-backend.onrender.com/api/post/comments/${post_id}/${id}`, {
             headers: {
                 "Content-Type": "application/json",
@@ -170,7 +184,8 @@ export const SelectedPost = () => {
         })
         if (status === 200) {
             Swal.fire(data.msg, "", "success")
-            getPost()
+            // getPost()
+            // navigate(`/p/${post._id}`)
         }
     }
 
@@ -297,6 +312,8 @@ export const SelectedPost = () => {
                     margin: "3vh auto"
                 }}>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                        {newComment?
+                        <>
                         <Form.Label> <h4>New Comment: </h4></Form.Label>
                         <Form.Control name="text" value={newcomment} as="textarea" rows={3} onChange={handleCommentChange} />
                         <div style={{
@@ -304,15 +321,19 @@ export const SelectedPost = () => {
                             justifyContent: "end"
                         }}>
 
-                            <Button className='m-2' onClick={handlenewCommentSubmit} > + Add Comment</Button>
+                            <Button className='m-2' onClick={handlenewCommentSubmit} ><i class="fa-solid fa-share"></i> Comment</Button>
+                            <Button variant='secondary' className='m-2' onClick={()=>setnewComment(false)} ><i class="fa-solid fa-close"></i> Cancel</Button>
                         </div>
+                            </>:
+                            <Button className='m-2 justify-content-end' onClick={()=>setnewComment(true)}> Add <i class="fa-solid fa-comment"></i></Button>
+                        }
                     </Form.Group>
                 </div>
                 <div className="container">
-                    <h3>{post.comments.length} Comments:</h3>
+                    <h3> Comments:</h3>
                 </div>
                 <div className="container">
-                    {post.comments.map(comment => {
+                    {/* {post.comments.map(comment => {
                         return <div key={comment._id} style={{
                             disple: "flex"
                         }} className="container m-2 p-2">
@@ -330,7 +351,7 @@ export const SelectedPost = () => {
                                             cursor: "pointer"
                                         }} onClick={handleViewProfile.bind(this, post.user._id)}>
                                             <img src={comment.avatar} alt="" height={"25vh"} width={"30vh"} /> {comment.name}{' '}
-                                            {profile.trainer?<Badge bg='secondary' >Trainer</Badge>:""}
+                                            
                                         </div>
                                         {comment.user === user._id ? <div>
                                             <Button variant={'danger'} onClick={handleCommentDelete.bind(this, comment._id)}><i className="fa-solid fa-trash"></i> Comment</Button>
@@ -346,12 +367,20 @@ export const SelectedPost = () => {
                                         {comment.text}
                                     </Card.Text>
                                     <Card.Text className='text-muted'>
+                                        
 
+                                    <i className="fa-regular fa-comment" style={{
+                                        cursor: "pointer"
+                                    }}></i> Reply
+                                    
                                         {timeDiff(new Date(), new Date(comment.date))}
                                     </Card.Text>
                                 </Card.Body>
                             </Card>
                         </div>
+                    })} */}
+                    {post.comments.map(comment=>{
+                        if(comment.parent=="0")return <Comment comment={comment}/>
                     })}
                 </div>
             </> : "" : ""}

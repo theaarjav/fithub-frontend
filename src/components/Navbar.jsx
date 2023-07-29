@@ -9,11 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import Spinner from 'react-bootstrap/esm/Spinner';
+
 export const NavbarApp = () => {
   const navigate = useNavigate();
   const [user, setuser] = useState([]);
   const [Log, setLog] = useState(false);
   const [profile, setprofile]=useState([]);
+  const [Loading, setLoading] = useState(true)
   const getUser = async () => {
     const { data } = await axios.get("https://maestrohub-backend.onrender.com/api/user/you", {
       headers: {
@@ -47,6 +50,7 @@ export const NavbarApp = () => {
         getProfile();
         setLog(true);
       }else setLog(false);
+      setLoading(false)
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -58,7 +62,7 @@ export const NavbarApp = () => {
   }
 
   return (
-
+    Loading?<Spinner/>:
     <Navbar sticky='top' bg="dark" data-bs-theme="dark"
       style={{
         display: "flex",
@@ -127,11 +131,11 @@ export const NavbarApp = () => {
               }}>
               {/* <p color='white'>|</p> */}
               
-              <img src={`${user.avatar}`} height={'50vh'} width={'50vh'} style={{
+              {user?<img src={`${user.avatar}`} height={'50vh'} width={'50vh'} style={{
                 borderRadius:"50%",
                 cursor:"pointer"
               }}alt=""  
-               /><DropdownButton
+               />:<></>}<DropdownButton
                as={ButtonGroup}
                key={''}
                id={`dropdown-variants`}

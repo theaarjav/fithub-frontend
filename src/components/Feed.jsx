@@ -30,9 +30,9 @@ export const Feed = () => {
         })
 
         if (status === 200) setuser(data.user);
+        else console.log("User not found")
 
-
-        // console.log(user)
+        console.log(data)
     }
     const getProfile = async () => {
         let { data, status } = await axios.get("https://maestrohub-backend.onrender.com/api/profile/me", {
@@ -42,7 +42,7 @@ export const Feed = () => {
             }
         })
         if (status === 200) setprofile(data.profile);
-        // setLoading(false);
+        setLoading(false);
     }
     const getProfiles = async () => {
         let allprofile = await axios.get("https://maestrohub-backend.onrender.com/api/profile/allusers");
@@ -64,20 +64,27 @@ export const Feed = () => {
         }
         getUser().then(() => { getAllPosts().then(() => { getProfiles(); }); })
         getProfile();
-        setLoading(false)
+        // setLoading(false)
     }, [])
 
     const handleViewProfile = async (id) => {
-        let { data, status } = await axios.get(`https://maestrohub-backend.onrender.com/api/profile/users/${id}`, {
-            headers: {
-                "Content-Type": "application/json",
+        console.log("clicked",id)
+        // return Swal.fire("get","","info")
+        let { data, status } = await axios.get(`https://maestrohub-backend.onrender.com/api/profile/users/${id}`)
+        console.log(data, status)
+        if (status === 200)
+        {
+            let profile;
+            if (data.profile) {
+                profile = data.profile._id;
+                navigate(`/users/${profile}`)
+            }else{
+                return Swal.fire(data.msg,"","info")
             }
-        })
-        let profile;
-        if (status === 200) profile = data.profile._id;
-        if (profile) {
-            navigate(`/users/${profile}`)
-        }
+        } 
+            
+        
+        
     }
 
     const [newpost, setnewpost] = useState({
@@ -182,38 +189,7 @@ export const Feed = () => {
         }
     }
 
-    function MyVerticallyCenteredModal(props) {
-        return (
-            <Modal
-                {...props}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        Liked By:
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {props.likes.map((like) => {
-                        return <div className='container' >
-                            {allusers.map(profile => {
-                                return <div >
-                                    {profile.user._id === like ? <Card>
-                                        <Card.Body style={{
-                                            fontWeight: "bold"
-                                        }}><img src={`${profile.user.avatar}`} height={"25vh"} width={"30vh"} alt={`${profile.user.name}'s avatar`}></img> {profile.user.name}</Card.Body>
-                                    </Card> : ""}
-                                </div>
-                            })}
-                        </div>
-                    })}
-                </Modal.Body>
-
-            </Modal>
-        );
-    }
+    
     const handleFollow = async (id) => {
         // console.log("HandleFollow")
         const { data, status } = await axios.put(`https://maestrohub-backend.onrender.com/api/profile/${id}`, {}, {
@@ -347,7 +323,7 @@ export const Feed = () => {
                             </div>
                             {post.user._id === user._id ? "" :
                                 <div >
-                                    <Button variant={`${profile.following.includes(post.user._id) ? "danger" : "primary"}`} onClick={handleFollow.bind(this, post.user._id)}>{`${profile.following.includes(post.user._id) ? "Unfollow" : "Follow"}`}</Button>
+                                    {profile?<Button variant={`${profile.following.includes(post.user._id) ? "danger" : "primary"}`} onClick={handleFollow.bind(this, post.user._id)}>{`${profile.following.includes(post.user._id) ? "Unfollow" : "Follow"}`}</Button>:<></>}
                                 </div>}
                         </ListGroup.Item>
                         <div className="container row">

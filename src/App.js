@@ -10,7 +10,6 @@ import { UserProfile } from './components/UserProfile';
 import { EditProfile } from './components/EditProfile';
 import { NewEd } from './components/NewEd';
 import { NewExp } from './components/NewExp';
-import { CreateProfile } from './components/CreateProfile';
 import { Feed } from './components/Feed';
 import { FollowersList } from './components/FollowersList';
 import { FollowingList } from './components/FollowingList';
@@ -29,7 +28,6 @@ function App() {
         <Route path='/users/:profileID' element={<UserProfile/>}></Route>
         <Route path='/addEducation' element={<NewEd/>}></Route>
         <Route path='/addExperience' element={<NewExp/>}></Route>
-        {/* <Route path='/createProfile' element={<CreateProfile/>}></Route> */}
         <Route path='/feed' element={<Feed/>}></Route>
         <Route path='/followers' element={<FollowersList/>}></Route>
         <Route path='/following' element={<FollowingList/>}></Route>
